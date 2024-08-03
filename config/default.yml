@@ -1,0 +1,23 @@
+gateway:
+  listenAddr: ":8080"
+  # versionHeader: "X-LBA-Version"
+  # versionPorts:
+  #   "v1": 8081
+  #   "v2": 8082
+  routes:
+    - name: "getProduct"
+      context: "/api/products/get"
+      target: "http://localhost:28841/api/products/get"
+  # aggregatedRoutes:
+  #   - name: "aggregatedRoute"
+  #     context: "/aggregate"
+  #     targets:
+  #       - target: "http://service-a"
+  #       - target: "http://service-b"
+  #         versioned: true
+  chainedRoutes:
+    - name: "validatePayment"
+      context: "/validate"
+      targets:
+        - target: "http://localhost:28841/api/validator/validate"
+        - target: "http://localhost:28840/api/config/takePaymentReward"
