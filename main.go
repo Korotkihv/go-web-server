@@ -6,8 +6,6 @@ import (
 	"os"
 	"web-server/config_loader"
 	"web-server/routes"
-
-	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -20,9 +18,7 @@ func main() {
 
 	log.Println("Initializing routes...")
 
-	r := mux.NewRouter()
-
-	routes.InitializeRoutes(r, cfg)
+	r := routes.InitializeRoutes(cfg)
 
 	log.Printf("Started server on %v", cfg.Gateway.ListenAddr)
 	log.Fatal(http.ListenAndServe(cfg.Gateway.ListenAddr, r))
