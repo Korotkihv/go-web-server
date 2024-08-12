@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -10,7 +9,7 @@ import (
 	"web-server/config_loader"
 )
 
-func NewChainedHandler(targets []config_loader.TargetRoute, versionPorts map[string]int, versionHeader string) func(http.ResponseWriter, *http.Request) {
+func NewChainedHandler(targets []config_loader.TargetConfig) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		initialBody, err := io.ReadAll(r.Body)
 		if err != nil {
@@ -22,15 +21,10 @@ func NewChainedHandler(targets []config_loader.TargetRoute, versionPorts map[str
 		var finalResponseBody []byte
 
 		for _, target := range targets {
-			targetURL := target.Target
-			if target.Versioned {
-				version := r.Header.Get(versionHeader)
-				port, ok := versionPorts[version]
-				if !ok {
-					http.Error(w, "Version not supported", http.StatusBadRequest)
-					return
-				}
-				targetURL = fmt.Sprintf("http://host.docker.internal:%d%s", port, target.Target)
+			targetURL, err := target.GetURL(r)
+			if err != nil {
+				log.Printf("Error get url addr:%v context:%v. %v", target.Addr, target.Context, err)
+				return
 			}
 
 			log.Println("Sending request to:", targetURL)

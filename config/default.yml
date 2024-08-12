@@ -1,23 +1,52 @@
 gateway:
   listenAddr: ":8080"
-  # versionHeader: "X-LBA-Version"
-  # versionPorts:
-  #   "v1": 8081
-  #   "v2": 8082
   routes:
-    - name: "getProduct"
+    - name: "products"
       context: "/api/products/get"
-      target: "http://localhost:28841/api/products/get"
-  # aggregatedRoutes:
-  #   - name: "aggregatedRoute"
-  #     context: "/aggregate"
-  #     targets:
-  #       - target: "http://service-a"
-  #       - target: "http://service-b"
-  #         versioned: true
+      target: 
+        addr: "http://localhost"
+        context: "/api/products/get"
+        port: 28841
+    - name: "auth"
+      context: "/auth"
+      target: 
+        addr: "http://localhost"
+        context: /auth
+        proxyPortHeader: "X-LBA-Version"
+    - name: "sendCrash"
+      context: "/sendCrash"
+      target: 
+        addr: "http://localhost"
+        context: "/sendCrash"
+        proxyPortHeader: "X-LBA-Version"
+  aggregatedRoutes:
+    # - name: "aggregatedTest"
+    #   context: "/aggregateTest"
+    #   targets:
+    #     - target: 
+    #       addr: http://localhost
+    #       context: /api/test
+    #       port: 28841
+    #     - target: 
+    #       addr: http://localhost
+    #       context: /api/test2
+    #       proxyPortHeader: "X-LBA-Version"
   chainedRoutes:
     - name: "validatePayment"
       context: "/validate"
       targets:
-        - target: "http://localhost:28841/api/validator/validate"
-        - target: "http://localhost:28840/api/config/takePaymentReward"
+        - target: 
+          addr: "http://localhost"
+          context: "/api/validator/validate"
+          port: 28841
+        - target: 
+          addr: "http://localhost"
+          context: "/api/config/takePaymentReward"
+          proxyPortHeader: "X-LBA-Version"
+  groupRoutes:
+  - name: "playerHub"
+    contextPrifix: "/playerHub"
+    target: 
+      addr: http://localhost
+      context:
+      proxyPortHeader: X-LBA-Version

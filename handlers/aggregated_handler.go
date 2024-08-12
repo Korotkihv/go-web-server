@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"sync"
@@ -10,25 +9,20 @@ import (
 	"web-server/config_loader"
 )
 
-func NewAggregatedHandler(targets []config_loader.TargetRoute, versionPorts map[string]int, versionHeader string) func(http.ResponseWriter, *http.Request) {
+func NewAggregatedHandler(targets []config_loader.TargetConfig) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var wg sync.WaitGroup
 		wg.Add(len(targets))
 
 		responses := make([]map[string]interface{}, len(targets))
 		for i, target := range targets {
-			go func(i int, target config_loader.TargetRoute) {
+			go func(i int, target config_loader.TargetConfig) {
 				defer wg.Done()
 
-				targetURL := target.Target
-				if target.Versioned {
-					version := r.Header.Get(versionHeader)
-					port, ok := versionPorts[version]
-					if !ok {
-						http.Error(w, "Version not supported", http.StatusBadRequest)
-						return
-					}
-					targetURL = fmt.Sprintf("http://host.docker.internal:%d%s", port, target.Target)
+				targetURL, err := target.GetURL(r)
+				if err != nil {
+					log.Printf("Error get url addr:%v context:%v. %v", target.Addr, target.Context, err)
+					return
 				}
 
 				resp, err := http.Get(targetURL)

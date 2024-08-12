@@ -5,12 +5,15 @@ go 1.22.5
 require (
 	github.com/gorilla/mux v1.8.1
 	github.com/spf13/viper v1.19.0
+	github.com/webview/webview_go v0.0.0-20240220051247-56f456ca3a43
 )
 
 require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
+	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
